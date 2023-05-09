@@ -116,7 +116,7 @@ $cap = create_captcha($text,$base_dir);
 	</tr>
 	<tr>
 		<td colspan=2 align="right"><br>
-		<a href="resetPass.php"> Forgot Password?</a>
+		<a href="resetPass.php"> Forgot Password? / Generate Password (First time users)</a>
 		</td>
 	</tr>
 </table>
