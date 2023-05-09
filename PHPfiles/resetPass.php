@@ -74,7 +74,9 @@ function get_url(){
 	  
 	return $url;  
 }
-
+function get_capt_code(){
+	return $capt_val = file_get_contents('../capt/'.session_id());
+}
 # When we update the password
 if(isset($_POST['u_pass'])){
 	$verification_token = filter_var($_POST['post_token'], FILTER_SANITIZE_STRING);
@@ -115,6 +117,15 @@ if(isset($_POST['u_pass'])){
 }
 #When we generate the token
 if(isset($_POST['gen_token'])){
+	
+	$verify = get_capt_code();
+	unlink('../capt/'.session_id());
+
+	if($_POST['cap-code']!=$verify){
+		echo "Invalid Captcha!";
+		echo "<a href='index.php'>Home</a>";
+		return;
+	}
 	$roll = filter_var($_POST['roll'], FILTER_SANITIZE_STRING);
 	$roll_string = shell_exec("cat $dbfile | grep -Fi -m 1 $roll");
 	$roll = explode(":",$roll_string)[0];
@@ -131,6 +142,52 @@ if(isset($_POST['gen_token'])){
 		}
 	}	
 }
+
+function create_captcha($text,$base_dir){
+	$width = 200;
+	$height = 100;
+	$font ="../capt/ASMAN.TTF";
+	
+	$image = imagecreatetruecolor($width,$height);
+	
+	$white = imagecolorallocate($image,255,255,255);
+	$black = imagecolorallocate($image,0,0,0);
+	
+	imagefill($image,0,0,$white);	
+  	imagettftext($image, 45, 7, $width/7, $height/1.5, $black, $font, $text);
+  	
+  	$warped_image = imagecreatetruecolor($width, $height);
+	imagefill($warped_image,0,0,imagecolorallocate($warped_image,255,255,255));
+	
+	
+	for($x=0; $x<$width; $x++){
+		for($y=0; $y<$height; $y++){
+			$index = imagecolorat($image,$x,$y);
+			$color_comp = imagecolorsforindex($image,$index);
+			
+			$color = imagecolorallocate($warped_image,$color_comp['red'], $color_comp['green'],$color_comp['blue']);
+			
+			$imageX = $x;
+			$imageY = $y + sin($x/3)*5;
+			
+			imagesetpixel($warped_image,$imageX,$imageY,$color);
+		}
+	}
+  	
+  	//header('Content-type: image/jpeg');
+  	
+  	imagejpeg($warped_image,'../capt/captcha.jpg');
+  	imagedestroy($warped_image);
+  	
+  	return $path;
+}
+$filename='../capt/'.session_id();
+$text=rand(10000,99999);
+
+file_put_contents($filename,$text);
+$cap = create_captcha($text,$base_dir);
+
+
 
 ?>
 <html>
@@ -158,6 +215,13 @@ if(isset($_POST['gen_token'])){
             height:10px;
             background-color: red;
         }
+		input{
+			border:1px black solid;
+		}
+		.mother{
+			display:flex;
+			align-items:center;
+		}
     </style>
 </head>
 
@@ -179,6 +243,14 @@ if(isset($_POST['gen_token'])){
 	<form action="resetPass.php" method="post">
 		<label for="roll">Enter your Roll Number </label>
 		<input type="text" name="roll"><br>
+		<div class="mother">
+			<!-- Captcha input box-->
+			<div id="user-input" class="inline">
+				<input type="text" id="cap-ent" name="cap-code" placeholder="Captcha code" />
+			</div>
+		 	<!-- Captcha view box-->
+		    	<divclass="inline"><img src="../capt/captcha.jpg" /></div>
+		</div>
 		<input type="submit" name="gen_token" value="Reset Password">
 	</form>
 	<?php }?>
