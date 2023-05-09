@@ -59,18 +59,7 @@ $cap = create_captcha($text,$base_dir);
 <head>
  <title>Login page</title>
  <!-- Captcha reload button-->
- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
  	<style>
- 		#sub{
-			background-color:#21209C;
-			color:#F1F1F1;
- 			border-radius:1px;
- 			border: 2px solid black;
- 			font-size:large;
- 			cursor:pointer;
- 			padding:10px;
- 			background-color:
- 		}
 		input{
 			border:1px black solid;
 		}
